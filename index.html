@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>贪吃蛇游戏</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>贪吃蛇游戏</h1>
+        <div class="game-container">
+            <!-- 左侧控制按钮 - 仅在移动设备显示 -->
+            <div class="left-mobile-controls">
+                <button class="arrow-btn up-left"><i class="fa fa-arrow-up"></i></button>
+                <div class="vertical-btns">
+                    <button class="arrow-btn left-left"><i class="fa fa-arrow-left"></i></button>
+                    <button class="arrow-btn right-left"><i class="fa fa-arrow-right"></i></button>
+                </div>
+                <button class="arrow-btn down-left"><i class="fa fa-arrow-down"></i></button>
+            </div>
+
+            <!-- 添加排名区域 -->
+            <div class="ranking-container">
+                <h3 class="ranking-title">排行榜</h3>
+                <div id="rankingList" class="ranking-list">
+                    <!-- 排名将通过JavaScript动态生成 -->
+                </div>
+            </div>
+
+            <div class="game-info">
+                <div class="score-board">
+                    <div>分数: <span id="score">0</span></div>
+                    <div>最高分: <span id="highScore">0</span></div>
+                </div>
+                <div class="controls">
+                    <button id="startBtn" class="btn"><i class="fa fa-play"></i> 开始</button>
+                    <button id="pauseBtn" class="btn" disabled><i class="fa fa-pause"></i> 暂停</button>
+                    <button id="restartBtn" class="btn" disabled><i class="fa fa-refresh"></i> 重新开始</button>
+                </div>
+            </div>
+            <canvas id="gameCanvas" width="400" height="400"></canvas>
+            <div class="difficulty-buttons">
+                <button id="easyBtn" class="btn active">简单</button>
+                <button id="hardBtn" class="btn">困难</button>
+                <button id="hellBtn" class="btn">地狱</button>
+            </div>
+            
+            <!-- 添加地图大小选择 -->
+            <div class="map-size-selector">
+                <label for="mapSize">地图大小:</label>
+                <!-- 确保select元素的ID是mapSize -->
+                <select id="mapSize" class="btn">
+                    <option value="20">20×20</option>
+                    <option value="30">30×30</option>
+                    <option value="50">50×50</option>
+                </select>
+            </div>
+            
+            <div class="mobile-controls">
+                <button class="arrow-btn up"><i class="fa fa-arrow-up"></i></button>
+                <div class="horizontal-btns">
+                    <button class="arrow-btn left"><i class="fa fa-arrow-left"></i></button>
+                    <button class="arrow-btn right"><i class="fa fa-arrow-right"></i></button>
+                </div>
+                <button class="arrow-btn down"><i class="fa fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="game-rules">
+            <h3>游戏规则</h3>
+            <ul>
+                <li>使用方向键或屏幕按钮控制蛇的移动</li>
+                <li>吃掉食物获得分数，蛇身会增长</li>
+                <li>撞到墙壁或自己的身体游戏结束</li>
+                <li>按空格键可以暂停/继续游戏</li>
+            </ul>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
