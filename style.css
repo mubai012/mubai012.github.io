@@ -210,9 +210,8 @@ h1 {
 
     #gameCanvas {
         width: 100%;
-        height: 100%;
-        /* 移除 aspect-ratio 属性，添加下面的代码 */
-        max-height: 100vw;
+        height: auto;
+        max-height: 70vh; /* 限制画布最大高度为视口的70% */
     }
 
     .mobile-controls {
@@ -230,6 +229,12 @@ h1 {
 
     .controls {
         justify-content: center;
+    }
+
+    /* 增加移动按钮的点击区域 */
+    .arrow-btn {
+        width: 70px;
+        height: 70px;
     }
 }
 
