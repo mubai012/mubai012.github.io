@@ -53,65 +53,72 @@ function isMobileDevice() {
 
 // 初始化控制按钮
 function initControls() {
-    // 现有底部控制按钮事件
-    if (upBtn) {
-        upBtn.addEventListener('click', () => {
-            if (direction !== 'down') {
-                nextDirection = 'up';
-            }
-        });
-    }
-    if (downBtn) {
-        downBtn.addEventListener('click', () => {
-            if (direction !== 'up') {
-                nextDirection = 'down';
-            }
-        });
-    }
-    if (leftBtn) {
-        leftBtn.addEventListener('click', () => {
-            if (direction !== 'right') {
-                nextDirection = 'left';
-            }
-        });
-    }
-    if (rightBtn) {
-        rightBtn.addEventListener('click', () => {
-            if (direction !== 'left') {
-                nextDirection = 'right';
-            }
-        });
+    // 添加事件监听的辅助函数
+    function addTouchEvent(element, callback) {
+        if (element) {
+            // 同时添加点击和触摸事件
+            element.addEventListener('click', callback);
+            element.addEventListener('touchstart', function(e) {
+                e.preventDefault(); // 防止触发鼠标事件
+                callback(e);
+            });
+        }
     }
 
+    // 现有底部控制按钮事件
+    addTouchEvent(upBtn, () => {
+        if (direction !== 'down') {
+            nextDirection = 'up';
+        }
+    });
+
+    addTouchEvent(downBtn, () => {
+        if (direction !== 'up') {
+            nextDirection = 'down';
+        }
+    });
+
+    addTouchEvent(leftBtn, () => {
+        if (direction !== 'right') {
+            nextDirection = 'left';
+        }
+    });
+
+    addTouchEvent(rightBtn, () => {
+        if (direction !== 'left') {
+            nextDirection = 'right';
+        }
+    });
+
     // 左侧控制按钮事件
-    if (upLeftBtn) {
-        upLeftBtn.addEventListener('click', () => {
-            if (direction !== 'down') {
-                nextDirection = 'up';
-            }
-        });
-    }
-    if (downLeftBtn) {
-        downLeftBtn.addEventListener('click', () => {
-            if (direction !== 'up') {
-                nextDirection = 'down';
-            }
-        });
-    }
-    if (leftLeftBtn) {
-        leftLeftBtn.addEventListener('click', () => {
-            if (direction !== 'right') {
-                nextDirection = 'left';
-            }
-        });
-    }
-    if (rightLeftBtn) {
-        rightLeftBtn.addEventListener('click', () => {
-            if (direction !== 'left') {
-                nextDirection = 'right';
-            }
-        });
-    }
+    addTouchEvent(upLeftBtn, () => {
+        if (direction !== 'down') {
+            nextDirection = 'up';
+        }
+    });
+
+    addTouchEvent(downLeftBtn, () => {
+        if (direction !== 'up') {
+            nextDirection = 'down';
+        }
+    });
+
+    addTouchEvent(leftLeftBtn, () => {
+        if (direction !== 'right') {
+            nextDirection = 'left';
+        }
+    });
+
+    addTouchEvent(rightLeftBtn, () => {
+        if (direction !== 'left') {
+            nextDirection = 'right';
+        }
+    });
+
+    // 为开始、暂停、重新开始按钮添加触摸事件
+    addTouchEvent(startBtn, startGame);
+    addTouchEvent(pauseBtn, pauseGame);
+    addTouchEvent(restartBtn, restartGame);
 
     // 根据设备类型调整界面
     if (isMobileDevice()) {
@@ -298,13 +305,13 @@ function startGame() {
         isGameOver = false;
         score = 0;
         scoreElement.textContent = score;
-        // 修复：初始化后立即启动游戏循环
         gameLoop();
     }
 
     if (isPaused) {
         isPaused = false;
         gameLoop();
+        pauseBtn.innerHTML = '<i class="fa fa-pause"></i> 暂停';
     }
 
     startBtn.disabled = true;
@@ -316,8 +323,8 @@ function startGame() {
 function pauseGame() {
     if (isPaused) {
         isPaused = false;
-        gameLoop();
         pauseBtn.innerHTML = '<i class="fa fa-pause"></i> 暂停';
+        gameLoop();
     } else {
         isPaused = true;
         clearTimeout(gameLoopId);
@@ -346,24 +353,23 @@ function gameOver() {
     startBtn.disabled = false;
     pauseBtn.disabled = true;
     restartBtn.disabled = false;
-    // 添加更新排名的代码
     updateRankings(score);
 }
 
 // 键盘控制
 function handleKeydown(e) {
-    // 游戏结束时，只允许R键和回车键操作
+    // 游戏结束期间，只允许相关操作
     if (isGameOver) {
         switch (e.key) {
-            case 'r':  // 小写r键重新开始
-            case 'R':  // 大写R键重新开始
+            case 'r':
+            case 'R':
                 restartGame();
                 break;
-            case 'Enter':  // 回车键开始游戏
+            case 'Enter':
                 startGame();
                 break;
         }
-        return;  // 忽略其他按键
+        return;
     }
 
     // 游戏进行中处理所有按键
@@ -396,10 +402,10 @@ function handleKeydown(e) {
                 nextDirection = 'right';
             }
             break;
-        case ' ':  // 空格键暂停/继续
+        case ' ':
             pauseGame();
             break;
-        case 'Enter':  // 回车键开始游戏
+        case 'Enter':
             startGame();
             break;
     }
@@ -407,30 +413,43 @@ function handleKeydown(e) {
 
 // 设置画布大小
 function setCanvasSize(mapSize = GRID_COUNT) {
-    // 确保画布在不同设备上有正确的大小
     const container = document.querySelector('.game-container');
     const containerWidth = container.clientWidth;
     
-    // 根据选择的地图大小计算画布尺寸
     const size = Math.min(containerWidth - 40, mapSize * GRID_SIZE);
     canvas.width = size;
     canvas.height = size;
     GRID_COUNT = Math.floor(canvas.width / GRID_SIZE);
 }
 
-// 初始化游戏函数修改
+// 初始化游戏
 function initGame() {
     highScoreElement.textContent = highScore;
     initControls();
-    setCanvasSize();  // 先设置画布大小
-    restartGame();    // 再重启游戏
+    setCanvasSize();
+    restartGame();
+
+    // 确保移除旧的事件监听器，避免重复绑定
+    if (startBtn) {
+        startBtn.removeEventListener('click', startGame);
+        startBtn.addEventListener('click', startGame);
+    }
+    if (pauseBtn) {
+        pauseBtn.removeEventListener('click', pauseGame);
+        pauseBtn.addEventListener('click', pauseGame);
+        console.log('暂停按钮事件监听器已添加'); // 用于调试
+    }
+    if (restartBtn) {
+        restartBtn.removeEventListener('click', restartGame);
+        restartBtn.addEventListener('click', restartGame);
+    }
 
     // 添加地图大小选择事件监听器
     if (mapSizeSelect) {
         mapSizeSelect.addEventListener('change', () => {
             const newSize = parseInt(mapSizeSelect.value);
             setCanvasSize(newSize);
-            restartGame();  // 改变地图大小后重启游戏
+            restartGame();
         });
     }
 
@@ -467,49 +486,18 @@ function initGame() {
     }
 }
 
-// 添加页面加载完成事件
-window.addEventListener('load', () => {
-    // 确保地图大小选择器存在
-    if (mapSizeSelect) {
-        // 手动触发一次change事件，确保画布正确初始化
-        const event = new Event('change');
-        mapSizeSelect.dispatchEvent(event);
-    }
-});
-
-// 调用初始化函数
-initGame();
-
-// 事件监听器
-startBtn.addEventListener('click', startGame);
-pauseBtn.addEventListener('click', pauseGame);
-restartBtn.addEventListener('click', restartGame);
-window.addEventListener('keydown', handleKeydown);
-
-// 移除重复的难度按钮事件监听器代码
-// 添加窗口大小变化时重新设置画布大小
-window.addEventListener('resize', setCanvasSize);
-
-// 添加排名相关变量
+// 排名相关功能
 let rankings = JSON.parse(localStorage.getItem('snakeRankings')) || [];
-const MAX_RANKINGS = 5;  // 最多显示5个排名
+const MAX_RANKINGS = 5;
 
-// 更新排名
 function updateRankings(newScore) {
-    // 添加新分数
     rankings.push(newScore);
-    // 按分数从高到低排序
     rankings.sort((a, b) => b - a);
-    // 只保留前MAX_RANKINGS个
     rankings = rankings.slice(0, MAX_RANKINGS);
-    // 保存到本地存储
     localStorage.setItem('snakeRankings', JSON.stringify(rankings));
-    // 更新显示
     displayRankings();
 }
 
-// 显示排名
-// 2. 实现displayRankings()函数
 function displayRankings() {
     const rankingElement = document.getElementById('rankings');
     if (!rankingElement) return;
@@ -519,7 +507,6 @@ function displayRankings() {
         const rankItem = document.createElement('div');
         rankItem.className = 'rank-item';
         
-        // 为前三名添加特殊样式
         if (index === 0) {
             rankItem.classList.add('first-place');
         } else if (index === 1) {
@@ -533,19 +520,22 @@ function displayRankings() {
     });
 }
 
-// 3. 在gameOver()函数中添加更新排名的代码
-function gameOver() {
-    clearTimeout(gameLoopId);
-    isGameOver = true;
-    startBtn.disabled = false;
-    pauseBtn.disabled = true;
-    restartBtn.disabled = false;
-    // 添加更新排名的代码
-    updateRankings(score);
-}
-
-// 4. 确保在页面加载完成后初始化排名显示
+// 页面加载完成事件
 window.addEventListener('load', () => {
-    // 初始化排名显示
-    displayRankings();
+    // 确保DOM完全加载后再初始化
+    setTimeout(() => {
+        initGame();
+        displayRankings();
+    
+        if (mapSizeSelect) {
+            const event = new Event('change');
+            mapSizeSelect.dispatchEvent(event);
+        }
+    }, 100); // 延迟100毫秒
 });
+
+// 窗口大小变化事件
+window.addEventListener('resize', setCanvasSize);
+
+// 键盘事件监听
+window.addEventListener('keydown', handleKeydown);
